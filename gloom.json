@@ -1,0 +1,26 @@
+{
+  "id": "ipo-calendar",
+  "name": "IPO Calendar",
+  "icon": "icon.svg",
+  "tagline": "Upcoming and recent IPOs with pricing and first-day return",
+  "description": "Upcoming and recently priced IPOs from Stock Analysis: expected date, price range, offer size, and the first-day return once it has traded. Select a row to open the ticker.",
+  "categories": [
+    "macro",
+    "markets"
+  ],
+  "targets": [
+    "cli",
+    "tui",
+    "desktop",
+    "web"
+  ],
+  "hosts": [
+    "stockanalysis.com"
+  ],
+  "contributes": {
+    "panes": [
+      "ipo-calendar"
+    ]
+  },
+  "minGloom": "0.15.0"
+}

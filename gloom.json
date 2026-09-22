@@ -1,7 +1,7 @@
 {
   "id": "ipo-calendar",
   "name": "IPO Calendar",
-  "icon": "icon.svg",
+  "icon": "icon.webp",
   "tagline": "Upcoming and recent IPOs with pricing and first-day return",
   "description": "Upcoming and recently priced IPOs from Stock Analysis: expected date, price range, offer size, and the first-day return once it has traded. Select a row to open the ticker.",
   "categories": [

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   DataTableView,
   EmptyState,
-  InputSearchBar, PaneStatusBody, useExternalLinkFooter,
+  PaneStatusBody, QueryBar, useExternalLinkFooter,
   type DataTableCell,
   type DataTableKeyEvent
 } from "gloomberb/components";
@@ -224,20 +224,20 @@ export function IPOCalendarPane({ focused, width, height }: PaneProps) {
   );
 
   const rootBefore = (
-    <InputSearchBar
-      value={searchQuery}
-      focused={focused}
-      active={searchFocused}
+    <QueryBar
       width={width}
-      focusToken={searchFocusToken}
-      inputRef={searchInputRef}
-      placeholder="ticker, company, or exchange"
-      debounceMs={SEARCH_DEBOUNCE_MS}
-      normalizeValue={(value) => value.trim()}
-      onFocus={focusSearch}
-      onBlur={blurSearch}
-      onNavigateDown={blurSearch}
-      onQueryChange={updateSearch}
+      search={{
+        value: searchQuery,
+        onChange: updateSearch,
+        placeholder: "ticker, company, or exchange",
+        focused,
+        active: searchFocused,
+        onActiveChange: (active) => (active ? setSearchFocused(true) : blurSearch()),
+        focusToken: searchFocusToken,
+        inputRef: searchInputRef,
+        debounceMs: SEARCH_DEBOUNCE_MS,
+        normalizeValue: (value) => value.trim(),
+      }}
     />
   );
 

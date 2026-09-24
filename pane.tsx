@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   DataTableView,
-  EmptyState,
-  PaneStatusBody, QueryBar, useExternalLinkFooter,
+  PaneStatusBody, QueryBar, unavailableText, useExternalLinkFooter, usePaneNoticeFooter,
   type DataTableCell,
   type DataTableKeyEvent
 } from "gloomberb/components";
@@ -27,6 +26,7 @@ import {
   formatShares,
   matchesSearch,
   nextSortPreference,
+  partialBoardNotices,
   sortRows,
   statusColor,
   stockAnalysisUrl,
@@ -139,19 +139,21 @@ export function IPOCalendarPane({ focused, width, height }: PaneProps) {
     [selectedTicker, sorted],
   );
 
+  // Rows kept from before a failed refresh are old, not partial: the footer says
+  // so rather than repeating the error.
+  const staleBoard = records.length > 0 && (stale || resource.error != null);
+
   const footerInfo = useMemo(() => [
     ...loadingErrorFooterInfo(status === "loading", records.length === 0 ? error : null),
-    // One endpoint failed while the other returned rows: say so without
-    // spilling a scrape URL into the footer.
-    ...(error && records.length > 0
-      ? [{ id: "partial", parts: [{ text: "PARTIAL", tone: "warning" as const, bold: true }] }]
-      : []),
-    ...(stale ? [{ id: "stale", parts: [{ text: "STALE", tone: "warning" as const }] }] : []),
-    ...(searchQuery ? [{
-      id: "search",
-      parts: [{ text: `filter: ${searchQuery}`, tone: "value" as const }],
-    }] : []),
-  ], [error, records.length, searchQuery, stale, status]);
+    ...(staleBoard ? [{ id: "stale", parts: [{ text: "stale", tone: "warning" as const }] }] : []),
+  ], [error, records.length, staleBoard, status]);
+
+  // One endpoint failed while the other returned rows.
+  usePaneNoticeFooter({
+    registrationId: `${IPO_CALENDAR_PANE_ID}-notices`,
+    notices: records.length > 0 && !staleBoard ? partialBoardNotices(resource.data?.errors ?? []) : [],
+    focused,
+  });
 
   const footerHints = useMemo(
     () => [{ id: "search", key: "/", label: "search", onPress: focusSearch }],
@@ -162,7 +164,6 @@ export function IPOCalendarPane({ focused, width, height }: PaneProps) {
     registrationId: IPO_CALENDAR_PANE_ID,
     focused,
     url: selectedRecord ? stockAnalysisUrl(selectedRecord.ticker) : null,
-    source: "stockanalysis.com",
     info: footerInfo,
     hints: footerHints,
   });
@@ -251,12 +252,11 @@ export function IPOCalendarPane({ focused, width, height }: PaneProps) {
   }
 
   if (status === "error" && records.length === 0) {
+    // The reason is in the footer, so the body does not repeat it.
     return (
       <Box flexDirection="column" width={width} height={height}>
         {rootBefore}
-        <Box padding={1} flexDirection="column" gap={1}>
-          <EmptyState status={error ? "error" : "empty"} title="IPO calendar unavailable." message={error ?? undefined} />
-        </Box>
+        <PaneStatusBody error={unavailableText("IPO calendar")} />
       </Box>
     );
   }

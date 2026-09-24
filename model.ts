@@ -77,20 +77,48 @@ export function stockAnalysisUrl(ticker: string): string {
 /** "$100.00-$120.00" is the widest price a row can hold; anything narrower clips a real number. */
 const PRICE_WIDTH = 15;
 
+/**
+ * COMPANY is the flexible column: it starts at this width and takes whatever
+ * the pane has left, so the numbers on the right never run off the edge.
+ */
+const COMPANY_MIN_WIDTH = 16;
+
+const ALL_COLUMNS: IPOColumn[] = [
+  { id: "ticker", label: "TICKER", width: 8, align: "left" },
+  { id: "company", label: "COMPANY", width: COMPANY_MIN_WIDTH, align: "left", flexGrow: 1 },
+  { id: "date", label: "DATE", width: 11, align: "left" },
+  { id: "status", label: "STATUS", width: 9, align: "left" },
+  { id: "exchange", label: "EXCH", width: 8, align: "left" },
+  { id: "offer", label: "OFFER", width: 8, align: "right" },
+  { id: "price", label: "PRICE", width: PRICE_WIDTH, align: "right" },
+  { id: "shares", label: "SHARES", width: 8, align: "right" },
+  { id: "return", label: "RETURN", width: 8, align: "right" },
+];
+
+/**
+ * Leave in this order as the pane narrows. All three are filled only for
+ * upcoming deals; SHARES goes first because OFFER and PRICE imply it.
+ */
+const OPTIONAL_COLUMNS: IPOColumnId[] = ["shares", "exchange", "offer"];
+
+/**
+ * Cells the table draws for these columns: each at least its header plus the
+ * sort arrow, a one-cell gap after each, and a cell of padding on either side.
+ * Every right-aligned column sits after the left-aligned ones, so there is no
+ * extra gutter to count.
+ */
+export function ipoTableWidth(columns: readonly IPOColumn[]): number {
+  return columns.reduce((sum, column) => sum + Math.max(column.width, column.label.length + 2) + 1, 2);
+}
+
 export function buildColumns(width: number): IPOColumn[] {
-  const fixed = 7 + 11 + 9 + 8 + 8 + PRICE_WIDTH + 7 + 8;
-  const companyWidth = Math.max(10, width - fixed - 11);
-  return [
-    { id: "ticker", label: "TICKER", width: 7, align: "left" },
-    { id: "company", label: "COMPANY", width: companyWidth, align: "left" },
-    { id: "date", label: "DATE", width: 11, align: "left" },
-    { id: "status", label: "STATUS", width: 9, align: "left" },
-    { id: "exchange", label: "EXCH", width: 8, align: "left" },
-    { id: "offer", label: "OFFER", width: 8, align: "right" },
-    { id: "price", label: "PRICE", width: PRICE_WIDTH, align: "right" },
-    { id: "shares", label: "SHARES", width: 7, align: "right" },
-    { id: "return", label: "RETURN", width: 8, align: "right" },
-  ];
+  const dropped = new Set<IPOColumnId>();
+  const visible = () => ALL_COLUMNS.filter((column) => !dropped.has(column.id));
+  for (const id of OPTIONAL_COLUMNS) {
+    if (ipoTableWidth(visible()) <= width) break;
+    dropped.add(id);
+  }
+  return visible();
 }
 
 function getSortValue(columnId: IPOColumnId, row: IPORecord): string | number | null {
@@ -131,3 +159,15 @@ export function nextSortPreference(current: IPOSortPreference, columnId: string)
 }
 
 export const matchesSearch = matchesIpoRecord;
+
+/**
+ * The board is two lists and one can fail while the other loads. Name the
+ * missing half in words: the raw errors carry request URLs.
+ */
+export function partialBoardNotices(errors: readonly string[]): string[] {
+  return errors.map((error) => {
+    if (error.startsWith("recent:")) return "Recent IPOs did not load, so only upcoming IPOs are listed.";
+    if (error.startsWith("upcoming:")) return "Upcoming IPOs did not load, so only recent IPOs are listed.";
+    return "Part of the IPO calendar did not load.";
+  });
+}

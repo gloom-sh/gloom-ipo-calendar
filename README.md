@@ -14,7 +14,7 @@ Open `IPO` in the command bar. Also in the hosted web app at term.gloom.sh, wher
 
 ## Usage
 
-`/` focuses the search, `r` refreshes. Activate a row to open the ticker once it trades. `gloomberb fn ipo-calendar` returns the headless model.
+`/` focuses the search, `r` refreshes, `o` opens the selected IPO on Stock Analysis. Activate a row to open the ticker once it trades. Narrow panes drop the SHARES, EXCH and OFFER columns, in that order, so the first-day return stays in view. When the upcoming or the recent list fails to load, the footer shows a warning and `!` says which half is missing; a board kept from before a failed refresh is marked stale. `gloomberb fn ipo-calendar` returns the headless model.
 
 ## Data
 

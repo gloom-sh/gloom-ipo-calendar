@@ -159,3 +159,15 @@ export function nextSortPreference(current: IPOSortPreference, columnId: string)
 }
 
 export const matchesSearch = matchesIpoRecord;
+
+/**
+ * The board is two lists and one can fail while the other loads. Name the
+ * missing half in words: the raw errors carry request URLs.
+ */
+export function partialBoardNotices(errors: readonly string[]): string[] {
+  return errors.map((error) => {
+    if (error.startsWith("recent:")) return "Recent IPOs did not load, so only upcoming IPOs are listed.";
+    if (error.startsWith("upcoming:")) return "Upcoming IPOs did not load, so only recent IPOs are listed.";
+    return "Part of the IPO calendar did not load.";
+  });
+}

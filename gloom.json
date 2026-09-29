@@ -20,6 +20,13 @@
   "contributes": {
     "panes": [
       "ipo-calendar"
+    ],
+    "shortcuts": [
+      {
+        "code": "IPO",
+        "name": "IPO Calendar",
+        "description": "Upcoming and recently priced IPOs with offer size and first-day return."
+      }
     ]
   },
   "minGloom": "0.15.0"

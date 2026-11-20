@@ -2,7 +2,9 @@
 
 Upcoming and recently priced IPOs: expected date, price range, offer size, and the first-day return once it has traded.
 
-## Install
+> IPO Calendar is built into Gloom v0.15.3 and later: open `IPO` in the command bar, with nothing to install from here. This repository is for older versions.
+
+## Install on older versions
 
 Requires Gloom 0.15.0 or newer. Gloom restores this plugin once for existing installations when it moves out of the core app: saved panes keep working because the pane and template ids are unchanged, a previously disabled plugin stays disabled, and a deliberate removal is respected.
 
@@ -18,7 +20,7 @@ Open `IPO` in the command bar. Also in the hosted web app at term.gloom.sh, wher
 
 ## Data
 
-[Stock Analysis](https://stockanalysis.com). Unofficial; if the site changes, the pane breaks until this plugin is updated, which is one reason it is a plugin rather than part of the core app. The last good list is cached so the pane has something to show before the first fetch.
+[Stock Analysis](https://stockanalysis.com). Unofficial; if the site changes, the pane breaks until it is updated. The last good list is cached so the pane has something to show before the first fetch.
 
 ## Development
 
